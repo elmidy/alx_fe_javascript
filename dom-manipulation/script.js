@@ -26,7 +26,7 @@ function showRandomQuote() {
 
 showButton.addEventListener("click", showRandomQuote);
 
-function addQuoteForm() {
+function createAddQuoteForm() {
   const form = document.createElement("form");
   form.id = "addQuoteForm";
 
@@ -65,4 +65,4 @@ function addQuoteForm() {
   });
 }
 
-addQuoteForm();
+createAddQuoteForm();
