@@ -13,17 +13,15 @@ const quotes = [
   },
 ];
 
-// Function to display a random quote
+const quoteArea = document.getElementById("quoteDisplay");
+const showButton = document.getElementById("newQuote");
+
 function showRandomQuote() {
-  const container = document.getElementById("quoteDisplay");
-  if (!container) return;
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
-  container.innerHTML = `
-        <blockquote>${quote.text}</blockquote>
-        <p><em>Category: ${quote.category}</em></p>
-    `;
+  quoteArea.innerHTML = `
+  <p>${quote.text}</p>
+  <small>category: ${quote.category}</small>`;
 }
 
-const qouteButton = document.getElementById("newQoute");
-qouteButton.addEventListener("click", showRandomQuote());
+showButton.addEventListener("click", showRandomQuote);
