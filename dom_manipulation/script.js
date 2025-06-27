@@ -42,6 +42,7 @@ function addQuoteForm() {
 
   const submitBtn = document.createElement("button");
   submitBtn.textContent = "Add Quote";
+  submitBtn.setAttribute("onclick", "addQuote()");
 
   form.appendChild(textInput);
   form.appendChild(categoryInput);
