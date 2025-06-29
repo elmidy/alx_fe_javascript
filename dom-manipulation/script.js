@@ -265,110 +265,78 @@ function findConflicts(localArr, serverArr) {
   };
 }
 
-function fetchQuotesFromServer() {
-  fetch(MOCK_API_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      const fetchedQuotes = data.slice(0, 5).map((item) => ({
-        text: item.title,
-        category: "Server",
-      }));
+async function fetchQuotesFromServer() {
+  try {
+    const res = await fetch(MOCK_API_URL);
+    const data = await res.json();
+    const fetchedQuotes = data.slice(0, 5).map((item) => ({
+      text: item.title,
+      category: "Server",
+    }));
 
-      const { onlyLocal, onlyServer, overlap } = findConflicts(
-        quotes,
-        fetchedQuotes
+    const { onlyLocal, onlyServer, overlap } = findConflicts(
+      quotes,
+      fetchedQuotes
+    );
+
+    let updated = false;
+    if (onlyServer.length > 0) {
+      onlyServer.forEach((q) => quotes.push(q));
+      updated = true;
+    }
+
+    if (updated) {
+      saveQuotes();
+      showNotification(
+        "Quotes updated from server. Server data takes precedence."
       );
-
-      let updated = false;
-      if (onlyServer.length > 0) {
-        onlyServer.forEach((q) => quotes.push(q));
-        updated = true;
-      }
-
-      if (updated) {
-        saveQuotes();
-        showNotification(
-          "Quotes updated from server. Server data takes precedence."
-        );
-        populateCategories(categoryDropdown.value);
-      }
-    })
-    .catch(() => {});
+      populateCategories(categoryDropdown.value);
+    }
+  } catch (e) {}
 }
 
 setInterval(fetchQuotesFromServer, 30000);
 
 fetchQuotesFromServer();
 
-function postQuoteToServer(quote) {
-  fetch(MOCK_API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      title: quote.text,
-      body: quote.category,
-      userId: 1,
-    }),
-  })
-    .then((res) => res.json())
-    .then(() => {})
-    .catch(() => {});
+async function postQuoteToServerAsync(quote) {
+  try {
+    await fetch(MOCK_API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: quote.text,
+        body: quote.category,
+        userId: 1,
+      }),
+    });
+  } catch (e) {}
 }
 
 document
   .getElementById("addQuoteForm")
-  .addEventListener("submit", function (e) {
+  .addEventListener("submit", async function (e) {
     const text = document.getElementById("newQuoteText").value.trim();
     const category = document.getElementById("newQuoteCategory").value.trim();
     if (text && category) {
-      postQuoteToServer({ text, category });
+      await postQuoteToServerAsync({ text, category });
     }
   });
-
-function showManualConflictResolution(localOnly, serverOnly) {
-  if (localOnly.length === 0 && serverOnly.length === 0) return;
-  let msg = "Conflict detected!\n";
-  if (localOnly.length) {
-    msg +=
-      `Local-only quotes (${localOnly.length}):\n` +
-      localOnly.map((q) => `- ${q.text}`).join("\n") +
-      "\n";
-  }
-  if (serverOnly.length) {
-    msg +=
-      `Server-only quotes (${serverOnly.length}):\n` +
-      serverOnly.map((q) => `- ${q.text}`).join("\n");
-  }
-  msg += "\nKeep local-only quotes? (OK = keep, Cancel = remove)";
-  if (!confirm(msg)) {
-    localOnly.forEach((lq) => {
-      const idx = quotes.findIndex(
-        (q) => q.text === lq.text && q.category === lq.category
-      );
-      if (idx !== -1) quotes.splice(idx, 1);
-    });
-    saveQuotes();
-    populateCategories(categoryDropdown.value);
-    showNotification("Local-only quotes removed per user choice.");
-  }
-}
 
 if (!document.getElementById("resolveConflictsBtn")) {
   const btn = document.createElement("button");
   btn.id = "resolveConflictsBtn";
   btn.textContent = "Resolve Quote Conflicts";
   btn.style.marginLeft = "10px";
-  btn.onclick = () => {
-    fetch(MOCK_API_URL)
-      .then((res) => res.json())
-      .then((data) => {
-        const fetchedQuotes = data.slice(0, 5).map((item) => ({
-          text: item.title,
-          category: "Server",
-        }));
-        const { onlyLocal, onlyServer } = findConflicts(quotes, fetchedQuotes);
-        showManualConflictResolution(onlyLocal, onlyServer);
-      });
+  btn.onclick = async () => {
+    const res = await fetch(MOCK_API_URL);
+    const data = await res.json();
+    const fetchedQuotes = data.slice(0, 5).map((item) => ({
+      text: item.title,
+      category: "Server",
+    }));
+    const { onlyLocal, onlyServer } = findConflicts(quotes, fetchedQuotes);
+    showManualConflictResolution(onlyLocal, onlyServer);
   };
   document.body.appendChild(btn);
 }
