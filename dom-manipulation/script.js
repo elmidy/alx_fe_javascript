@@ -33,7 +33,7 @@ function createAddQuoteForm() {
   const textInput = document.createElement("input");
   textInput.id = "newQuoteText";
   textInput.type = "text";
-  textInput.placeholder = "Ente a new quote";
+  textInput.placeholder = "Enter a new quote";
 
   const categoryInput = document.createElement("input");
   categoryInput.id = "newQuoteCategory";
