@@ -126,13 +126,7 @@ exportBtn.addEventListener("click", function () {
   URL.revokeObjectURL(url);
 });
 
-const importInput = document.createElement("input");
-importInput.type = "file";
-importInput.accept = ".json";
-importInput.id = "importFile";
-importInput.style.display = "block";
-importInput.style.marginTop = "10px";
-importInput.setAttribute("onchange", "importFromJsonFiles(event)");
+const importInput = document.getElementById("importFile");
 exportBtn.insertAdjacentElement("afterend", importInput);
 
 importInput.addEventListener("change", function (e) {
