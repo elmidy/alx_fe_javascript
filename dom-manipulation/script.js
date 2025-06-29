@@ -287,9 +287,7 @@ async function fetchQuotesFromServer() {
 
     if (updated) {
       saveQuotes();
-      showNotification(
-        "Quotes updated from server. Server data takes precedence."
-      );
+      showNotification("Quotes synced with server!");
       populateCategories(categoryDropdown.value);
     }
   } catch (e) {}
