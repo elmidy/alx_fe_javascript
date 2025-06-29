@@ -125,5 +125,3 @@ exportBtn.addEventListener("click", function () {
   document.body.removeChild(downloadLink);
   URL.revokeObjectURL(url);
 });
-
-document.body.appendChild(exportBtn);
