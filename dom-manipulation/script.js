@@ -110,9 +110,7 @@ if (lastViewed !== null && quotes[lastViewed]) {
   <small>category: ${quote.category}</small>`;
 }
 
-const exportBtn = document.createElement("button");
-exportBtn.id = "exportQuotes";
-exportBtn.textContent = "Export Quotes";
+const exportBtn = document.getElementById("exportQuotes");
 exportBtn.addEventListener("click", function () {
   const dataStr = JSON.stringify(quotes, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
