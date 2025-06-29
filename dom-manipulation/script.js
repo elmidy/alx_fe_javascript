@@ -139,3 +139,16 @@ function importFromJsonFile(event) {
   };
   fileReader.readAsText(event.target.files[0]);
 }
+
+function populateCategories() {
+  const categories = [...new Set(quotes.map((q) => q.category))];
+  let dropdown = document.getElementById("categoryFilter");
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    dropdown.appendChild(option);
+  });
+}
+
+populateCategories();
