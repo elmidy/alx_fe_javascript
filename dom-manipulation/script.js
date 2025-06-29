@@ -226,3 +226,149 @@ importInput.addEventListener("change", function (event) {
 });
 
 restoreLastSelectedCategory();
+
+const MOCK_API_URL = "https://jsonplaceholder.typicode.com/posts";
+
+function showNotification(message) {
+  let notif = document.getElementById("quoteNotif");
+  if (!notif) {
+    notif = document.createElement("div");
+    notif.id = "quoteNotif";
+    notif.style.position = "fixed";
+    notif.style.bottom = "20px";
+    notif.style.right = "20px";
+    notif.style.background = "#222";
+    notif.style.color = "#fff";
+    notif.style.padding = "10px 20px";
+    notif.style.borderRadius = "5px";
+    notif.style.zIndex = 1000;
+    document.body.appendChild(notif);
+  }
+  notif.textContent = message;
+  notif.style.display = "block";
+  setTimeout(() => {
+    notif.style.display = "none";
+  }, 4000);
+}
+
+function findConflicts(localArr, serverArr) {
+  const localSet = new Set(localArr.map((q) => q.text + "|" + q.category));
+  const serverSet = new Set(serverArr.map((q) => q.text + "|" + q.category));
+  return {
+    onlyLocal: localArr.filter(
+      (q) => !serverSet.has(q.text + "|" + q.category)
+    ),
+    onlyServer: serverArr.filter(
+      (q) => !localSet.has(q.text + "|" + q.category)
+    ),
+    overlap: serverArr.filter((q) => localSet.has(q.text + "|" + q.category)),
+  };
+}
+
+function fetchQuotesFromServer() {
+  fetch(MOCK_API_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      const fetchedQuotes = data.slice(0, 5).map((item) => ({
+        text: item.title,
+        category: "Server",
+      }));
+
+      const { onlyLocal, onlyServer, overlap } = findConflicts(
+        quotes,
+        fetchedQuotes
+      );
+
+      let updated = false;
+      if (onlyServer.length > 0) {
+        onlyServer.forEach((q) => quotes.push(q));
+        updated = true;
+      }
+
+      if (updated) {
+        saveQuotes();
+        showNotification(
+          "Quotes updated from server. Server data takes precedence."
+        );
+        populateCategories(categoryDropdown.value);
+      }
+    })
+    .catch(() => {});
+}
+
+setInterval(fetchQuotesFromServer, 30000);
+
+fetchQuotesFromServer();
+
+function postQuoteToServer(quote) {
+  fetch(MOCK_API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      title: quote.text,
+      body: quote.category,
+      userId: 1,
+    }),
+  })
+    .then((res) => res.json())
+    .then(() => {})
+    .catch(() => {});
+}
+
+document
+  .getElementById("addQuoteForm")
+  .addEventListener("submit", function (e) {
+    const text = document.getElementById("newQuoteText").value.trim();
+    const category = document.getElementById("newQuoteCategory").value.trim();
+    if (text && category) {
+      postQuoteToServer({ text, category });
+    }
+  });
+
+function showManualConflictResolution(localOnly, serverOnly) {
+  if (localOnly.length === 0 && serverOnly.length === 0) return;
+  let msg = "Conflict detected!\n";
+  if (localOnly.length) {
+    msg +=
+      `Local-only quotes (${localOnly.length}):\n` +
+      localOnly.map((q) => `- ${q.text}`).join("\n") +
+      "\n";
+  }
+  if (serverOnly.length) {
+    msg +=
+      `Server-only quotes (${serverOnly.length}):\n` +
+      serverOnly.map((q) => `- ${q.text}`).join("\n");
+  }
+  msg += "\nKeep local-only quotes? (OK = keep, Cancel = remove)";
+  if (!confirm(msg)) {
+    localOnly.forEach((lq) => {
+      const idx = quotes.findIndex(
+        (q) => q.text === lq.text && q.category === lq.category
+      );
+      if (idx !== -1) quotes.splice(idx, 1);
+    });
+    saveQuotes();
+    populateCategories(categoryDropdown.value);
+    showNotification("Local-only quotes removed per user choice.");
+  }
+}
+
+if (!document.getElementById("resolveConflictsBtn")) {
+  const btn = document.createElement("button");
+  btn.id = "resolveConflictsBtn";
+  btn.textContent = "Resolve Quote Conflicts";
+  btn.style.marginLeft = "10px";
+  btn.onclick = () => {
+    fetch(MOCK_API_URL)
+      .then((res) => res.json())
+      .then((data) => {
+        const fetchedQuotes = data.slice(0, 5).map((item) => ({
+          text: item.title,
+          category: "Server",
+        }));
+        const { onlyLocal, onlyServer } = findConflicts(quotes, fetchedQuotes);
+        showManualConflictResolution(onlyLocal, onlyServer);
+      });
+  };
+  document.body.appendChild(btn);
+}
