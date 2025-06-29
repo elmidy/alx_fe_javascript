@@ -66,3 +66,46 @@ function createAddQuoteForm() {
 }
 
 createAddQuoteForm();
+
+function saveQuotesToLocalStorage() {
+  localStorage.setItem("quotes", JSON.stringify(quotes));
+}
+
+function loadQuotesFromLocalStorage() {
+  const storedQuotes = localStorage.getItem("quotes");
+  if (storedQuotes) {
+    try {
+      const parsedQuotes = JSON.parse(storedQuotes);
+      if (Array.isArray(parsedQuotes)) {
+        quotes.length = 0;
+        quotes.push(...parsedQuotes);
+      }
+    } catch (e) {}
+  }
+}
+
+document.getElementById("addQuoteForm").addEventListener("submit", function () {
+  saveQuotesToLocalStorage();
+});
+
+loadQuotesFromLocalStorage();
+
+function showRandomQuoteWithSession() {
+  const randomIndex = Math.floor(Math.random() * quotes.length);
+  const quote = quotes[randomIndex];
+  quoteArea.innerHTML = `
+  <p>${quote.text}</p>
+  <small>category: ${quote.category}</small>`;
+  sessionStorage.setItem("lastViewedQuote", randomIndex);
+}
+
+showButton.removeEventListener("click", showRandomQuote);
+showButton.addEventListener("click", showRandomQuoteWithSession);
+
+const lastViewed = sessionStorage.getItem("lastViewedQuote");
+if (lastViewed !== null && quotes[lastViewed]) {
+  const quote = quotes[lastViewed];
+  quoteArea.innerHTML = `
+  <p>${quote.text}</p>
+  <small>category: ${quote.category}</small>`;
+}
