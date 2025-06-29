@@ -152,3 +152,23 @@ function populateCategories() {
 }
 
 populateCategories();
+function filterQuotes() {
+  const dropdown = document.getElementById("categoryFilter");
+  const selectedCategory = dropdown.value;
+  let filteredQuotes = quotes;
+  if (selectedCategory !== "All") {
+    filteredQuotes = quotes.filter((q) => q.category === selectedCategory);
+  }
+  if (filteredQuotes.length > 0) {
+    const quote = filteredQuotes[0];
+    quoteArea.innerHTML = `
+      <p>${quote.text}</p>
+      <small>category: ${quote.category}</small>`;
+  } else {
+    quoteArea.innerHTML = "<p>No quotes found for this category.</p>";
+  }
+}
+
+document
+  .getElementById("categoryFilter")
+  .addEventListener("change", filterQuotes);
