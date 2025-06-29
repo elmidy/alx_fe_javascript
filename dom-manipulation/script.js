@@ -111,7 +111,7 @@ if (lastViewed !== null && quotes[lastViewed]) {
 }
 
 const exportBtn = document.createElement("button");
-exportBtn.textContent = "Download Quotes";
+exportBtn.textContent = "Export Quotes";
 exportBtn.addEventListener("click", function () {
   const dataStr = JSON.stringify(quotes, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
