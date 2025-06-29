@@ -125,3 +125,35 @@ exportBtn.addEventListener("click", function () {
   document.body.removeChild(downloadLink);
   URL.revokeObjectURL(url);
 });
+
+const importInput = document.createElement("input");
+importInput.type = "file";
+importInput.accept = ".json";
+importInput.id = "importFile";
+importInput.style.display = "block";
+importInput.style.marginTop = "10px";
+importInput.setAttribute("onchange", "importFromJsonFiles(event)");
+exportBtn.insertAdjacentElement("afterend", importInput);
+
+importInput.addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function (event) {
+    try {
+      const importedQuotes = JSON.parse(event.target.result);
+      if (Array.isArray(importedQuotes)) {
+        quotes.length = 0;
+        quotes.push(...importedQuotes);
+        saveQuotesToLocalStorage();
+        alert("Quotes imported successfully!");
+        showRandomQuoteWithSession();
+      } else {
+        alert("Invalid file format.");
+      }
+    } catch {
+      alert("Failed to import quotes. Invalid JSON.");
+    }
+  };
+  reader.readAsText(file);
+});
