@@ -129,25 +129,13 @@ exportBtn.addEventListener("click", function () {
 const importInput = document.getElementById("importFile");
 exportBtn.insertAdjacentElement("afterend", importInput);
 
-importInput.addEventListener("change", function (e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function (event) {
-    try {
-      const importedQuotes = JSON.parse(event.target.result);
-      if (Array.isArray(importedQuotes)) {
-        quotes.length = 0;
-        quotes.push(...importedQuotes);
-        saveQuotesToLocalStorage();
-        alert("Quotes imported successfully!");
-        showRandomQuoteWithSession();
-      } else {
-        alert("Invalid file format.");
-      }
-    } catch {
-      alert("Failed to import quotes. Invalid JSON.");
-    }
+function importFromJsonFile(event) {
+  const fileReader = new FileReader();
+  fileReader.onload = function (event) {
+    const importedQuotes = JSON.parse(event.target.result);
+    quotes.push(...importedQuotes);
+    saveQuotes();
+    alert("Quotes imported successfully!");
   };
-  reader.readAsText(file);
-});
+  fileReader.readAsText(event.target.files[0]);
+}
