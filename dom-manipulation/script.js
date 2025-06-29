@@ -109,3 +109,22 @@ if (lastViewed !== null && quotes[lastViewed]) {
   <p>${quote.text}</p>
   <small>category: ${quote.category}</small>`;
 }
+
+const exportBtn = document.createElement("button");
+exportBtn.textContent = "Download Quotes";
+exportBtn.addEventListener("click", function () {
+  const dataStr = JSON.stringify(quotes, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const downloadLink = document.createElement("a");
+  downloadLink.href = url;
+  downloadLink.download = "quotes.json";
+  downloadLink.style.display = "none";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  URL.revokeObjectURL(url);
+});
+
+document.body.appendChild(exportBtn);
