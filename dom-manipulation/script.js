@@ -110,9 +110,9 @@ if (lastViewed !== null && quotes[lastViewed]) {
   <small>category: ${quote.category}</small>`;
 }
 
-const exportBtn = document.createElement("button");
-exportBtn.textContent = "Export Quotes";
-exportBtn.addEventListener("click", function () {
+const exportQuotes = document.createElement("button");
+exportQuotes.textContent = "Download Quotes";
+exportQuotes.addEventListener("click", function () {
   const dataStr = JSON.stringify(quotes, null, 2);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
@@ -127,4 +127,4 @@ exportBtn.addEventListener("click", function () {
   URL.revokeObjectURL(url);
 });
 
-document.body.appendChild(exportBtn);
+document.body.appendChild(exportQuotes);
