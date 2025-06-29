@@ -299,7 +299,7 @@ setInterval(fetchQuotesFromServer, 30000);
 
 fetchQuotesFromServer();
 
-async function postQuoteToServerAsync(quote) {
+async function syncQuotes(quote) {
   try {
     await fetch(MOCK_API_URL, {
       method: "POST",
