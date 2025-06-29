@@ -10,6 +10,12 @@
     <div id="quoteDisplay"></div>
     <button id="newQuote">Show New Quote</button>
     <button id="exportQuotes">Export Quotes</button>
+    <input
+      type="file"
+      accept=".json"
+      id="importFile"
+      onchange="importFromJsonFiles(event)"
+    />
     <script src="script.js"></script>
   </body>
 </html>
